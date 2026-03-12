@@ -15,7 +15,7 @@ class MQTTService: NSObject {
     init(
         host: String = "localhost",
         port: UInt16 = 8883,
-        clientID: String = "iOSClient-1",
+        clientID: String = "bus_103",
         clientP12Name: String = "client",
         clientP12Password: String = "123456",
         caCertName: String = "ca-cert"
@@ -33,6 +33,10 @@ class MQTTService: NSObject {
         mqtt5 = CocoaMQTT5(clientID: clientID, host: host, port: port)
         mqtt5?.delegate = self
         mqtt5?.keepAlive = 60
+        
+        mqtt5?.username = clientID
+//        mqtt5?.password = jwtToken
+        mqtt5?.password = "123456"
 
         // Enable SSL and enforce strict validation
         mqtt5?.enableSSL = true
@@ -70,6 +74,14 @@ class MQTTService: NSObject {
 
     func disconnect() {
         mqtt5?.disconnect()
+    }
+    
+    func subscribe(id: String) {
+        mqtt5?.subscribe("bus/\(id)/chat")
+    }
+    
+    func publish(id: String) {
+        mqtt5?.publish(.init(topic: "bus/\(id)/chat", string: "Hello from iOS!!"), properties: MqttPublishProperties())
     }
 }
 
@@ -137,8 +149,12 @@ extension MQTTService: CocoaMQTT5Delegate {
     }
 
     // Required Delegate Methods (No-op)
-    func mqtt5(_ mqtt5: CocoaMQTT5, didPublishMessage m: CocoaMQTT5Message, id: UInt16) {}
-    func mqtt5(_ mqtt5: CocoaMQTT5, didPublishAck id: UInt16, pubAckData: MqttDecodePubAck?) {}
+    func mqtt5(_ mqtt5: CocoaMQTT5, didPublishMessage m: CocoaMQTT5Message, id: UInt16) {
+        print("PUB:: sending a message ...")
+    }
+    func mqtt5(_ mqtt5: CocoaMQTT5, didPublishAck id: UInt16, pubAckData: MqttDecodePubAck?) {
+        print("PUB:: responseCode", pubAckData?.reasonCode?.rawValue)
+    }
     func mqtt5(_ mqtt5: CocoaMQTT5, didPublishRec id: UInt16, pubRecData: MqttDecodePubRec?) {}
     func mqtt5(_ mqtt5: CocoaMQTT5, didUnsubscribeTopics t: [String], unsubAckData: MqttDecodeUnsubAck?) {}
     func mqtt5(_ mqtt5: CocoaMQTT5, didReceiveDisconnectReasonCode r: CocoaMQTTDISCONNECTReasonCode) {}
@@ -146,5 +162,8 @@ extension MQTTService: CocoaMQTT5Delegate {
     func mqtt5DidPing(_ mqtt5: CocoaMQTT5) {}
     func mqtt5DidReceivePong(_ mqtt5: CocoaMQTT5) {}
     func mqtt5(_ mqtt5: CocoaMQTT5, didReceiveMessage m: CocoaMQTT5Message, id: UInt16, publishData: MqttDecodePublish?) {}
-    func mqtt5(_ mqtt5: CocoaMQTT5, didSubscribeTopics s: NSDictionary, failed: [String], subAckData: MqttDecodeSubAck?) {}
+    func mqtt5(_ mqtt5: CocoaMQTT5, didSubscribeTopics s: NSDictionary, failed: [String], subAckData: MqttDecodeSubAck?) {
+        let hehe = subAckData?.reasonCodes[0]
+        print("SUB:: responseCode", subAckData?.reasonCodes.forEach({ $0.rawValue }))
+    }
 }
