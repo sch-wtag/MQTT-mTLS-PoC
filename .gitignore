@@ -1,8 +1,8 @@
-emqx_setup/certs/*
+# emqx_setup/certs/*
 docker_vol
 .DS_Store
 MQTT-mTLS-iOS-PoC/.DS_Store
-MQTT-mTLS-iOS-PoC/MQTT-mTLS-POC/client.p12
-MQTT-mTLS-iOS-PoC/MQTT-mTLS-POC/ca-cert.der
+# MQTT-mTLS-iOS-PoC/MQTT-mTLS-POC/client.p12
+# MQTT-mTLS-iOS-PoC/MQTT-mTLS-POC/ca-cert.der
 Auth-Backend/node_modules
 Auth-Backend/package-lock.json
